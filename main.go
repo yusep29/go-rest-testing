@@ -13,6 +13,11 @@ func getAlbums(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, albums)
 }
 
+func getOneAlbums(c *gin.Context) {
+	var albumOne = album{ID: "123", Title: "yuseo and the gang", Artist: "yuseo", Price: 12.5}
+	c.IndentedJSON(http.StatusOK, albumOne)
+}
+
 func getCatFact(c *gin.Context) {
 	url := "https://catfact.ninja/fact"
 
@@ -30,6 +35,7 @@ func getCatFact(c *gin.Context) {
 func main() {
 	router := gin.Default()
 	router.GET("/albums", getAlbums)
+	router.GET("/album-one", getOneAlbums)
 	router.GET("/cat", getCatFact)
 
 	router.Run("localhost:8080")
