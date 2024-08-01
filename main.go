@@ -1,6 +1,8 @@
 package main
 
 import (
+	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,9 +13,24 @@ func getAlbums(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, albums)
 }
 
+func getCatFact(c *gin.Context) {
+	url := "https://catfact.ninja/fact"
+
+	resp, getErr := http.Get(url)
+	if getErr != nil {
+		log.Fatal(getErr)
+	}
+	body, readErr := ioutil.ReadAll(resp.Body)
+	if readErr != nil {
+		log.Fatal(readErr)
+	}
+	c.IndentedJSON(http.StatusOK, string(body))
+}
+
 func main() {
 	router := gin.Default()
 	router.GET("/albums", getAlbums)
+	router.GET("/cat", getCatFact)
 
 	router.Run("localhost:8080")
 }
