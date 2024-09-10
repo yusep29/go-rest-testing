@@ -37,15 +37,19 @@ func getCatFact(c *gin.Context) {
 }
 
 func getUser(c *gin.Context) {
-	place := User{}
+	arrUser := make([]User, 0)
+	user := User{}
 	rows, _ := dbConn.Queryx("SELECT username, password FROM ms_user")
+	i := 0
 	for rows.Next() {
-		err := rows.StructScan(&place)
+		err := rows.StructScan(&user)
 		if err != nil {
 			log.Fatalln(err)
 		}
+		arrUser = append(arrUser, user)
+		i++
 	}
-	c.IndentedJSON(http.StatusOK, place)
+	c.IndentedJSON(http.StatusOK, arrUser)
 }
 
 type User struct {
