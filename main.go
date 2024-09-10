@@ -6,7 +6,11 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
+
+var dbConn sqlx.DB
 
 // getAlbums responds with the list of all albums as JSON.
 func getAlbums(c *gin.Context) {
@@ -32,13 +36,45 @@ func getCatFact(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, string(body))
 }
 
+func getUser(c *gin.Context) {
+	place := User{}
+	rows, _ := dbConn.Queryx("SELECT username, password FROM ms_user")
+	for rows.Next() {
+		err := rows.StructScan(&place)
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+	c.IndentedJSON(http.StatusOK, place)
+}
+
+type User struct {
+	Name         string `db:"username"`
+	PasswordHash string `db:"password"`
+}
+
 func main() {
+	db, err := sqlx.Connect("postgres", "user=postgres dbname=postgres port=5432  password=awsedrftgyhu1234 host=database-1.cx2e4smagi79.eu-north-1.rds.amazonaws.com")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer db.Close()
+
+	if err := db.Ping(); err != nil {
+		log.Fatal(err)
+	} else {
+		log.Println("Successfuly connected")
+	}
+
+	dbConn = *db
+
 	router := gin.Default()
 	router.GET("/albums", getAlbums)
 	router.GET("/album-one", getOneAlbums)
 	router.GET("/cat", getCatFact)
+	router.GET("/user", getUser)
 
-	router.Run("localhost:8080")
+	router.Run(":8081")
 }
 
 // album represents data about a record album.
