@@ -1,7 +1,7 @@
 package main
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -15,7 +15,7 @@ func getCatFact(c *gin.Context) {
 	if getErr != nil {
 		log.Fatal(getErr)
 	}
-	body, readErr := ioutil.ReadAll(resp.Body)
+	body, readErr := io.ReadAll(resp.Body)
 	if readErr != nil {
 		log.Fatal(readErr)
 	}
